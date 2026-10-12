@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin CleanWash Laundry</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4fafc;
+            color: #263238;
+        }
+
+
+        /* HEADER */
+
+        header {
+            background: #246b8f;
+            color: white;
+            padding: 25px 8%;
+        }
+
+        header h1 {
+            margin-bottom: 7px;
+        }
+
+
+        /* CONTAINER */
+
+        .container {
+            width: 84%;
+            max-width: 1100px;
+            margin: 35px auto;
+        }
+
+
+        /* TOMBOL */
+
+        .btn {
+            border: none;
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-home {
+            background: white;
+            color: #246b8f;
+            margin-top: 15px;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+
+        /* STATISTIK */
+
+        .statistik {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 7px 20px rgba(0,0,0,0.07);
+        }
+
+        .stat h2 {
+            color: #246b8f;
+            font-size: 32px;
+            margin-top: 10px;
+        }
+
+
+        /* SEARCH */
+
+        .search {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cfd8dc;
+            border-radius: 8px;
+        }
+
+
+        /* PESANAN */
+
+        .pesanan {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 18px;
+            box-shadow: 0 7px 20px rgba(0,0,0,0.07);
+        }
+
+        .pesanan h3 {
+            color: #246b8f;
+            margin-bottom: 12px;
+        }
+
+        .pesanan p {
+            line-height: 1.7;
+        }
+
+
+        /* STATUS */
+
+        .status {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status select {
+            padding: 11px;
+            border-radius: 8px;
+            border: 1px solid #cfd8dc;
+        }
+
+
+        /* KOSONG */
+
+        .kosong {
+            background: white;
+            text-align: center;
+            padding: 50px;
+            border-radius: 15px;
+            color: #78909c;
+        }
+
+
+        @media (max-width: 700px) {
+
+            .statistik {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <header>
+
+        <h1>🧺 Admin CleanWash Laundry</h1>
+
+        <p>
+            Kelola pesanan laundry pelanggan.
+        </p>
+
+        <a href="laundry.html">
+
+            <button class="btn btn-home">
+                ← Kembali ke Website
+            </button>
+
+        </a>
+
+    </header>
+
+
+    <div class="container">
+
+
+        <!-- STATISTIK -->
+
+        <div class="statistik">
+
+            <div class="stat">
+
+                <p>Total Pesanan</p>
+
+                <h2 id="totalPesanan">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="stat">
+
+                <p>Pesanan Diproses</p>
+
+                <h2 id="diproses">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="stat">
+
+                <p>Pesanan Selesai</p>
+
+                <h2 id="selesai">
+                    0
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="search">
+
+            <input
+                type="text"
+                id="cari"
+                placeholder="🔍 Cari berdasarkan nama..."
+                oninput="tampilkanPesanan()"
+            >
+
+        </div>
+
+
+        <!-- DAFTAR PESANAN -->
+
+        <div id="daftarPesanan"></div>
+
+
+    </div>
+
+
+    <script>
+
+
+        /* TAMPILKAN PESANAN */
+
+        function tampilkanPesanan() {
+
+            var pesanan =
+                JSON.parse(
+                    localStorage.getItem("pesananLaundry")
+                ) || [];
+
+
+            var daftar =
+                document.getElementById("daftarPesanan");
+
+
+            var cari =
+                document
+                .getElementById("cari")
+                .value
+                .toLowerCase();
+
+
+            var hasil = [];
+
+
+            for (var i = 0; i < pesanan.length; i++) {
+
+                if (
+                    pesanan[i].nama
+                    .toLowerCase()
+                    .includes(cari)
+                ) {
+
+                    hasil.push(pesanan[i]);
+
+                }
+
+            }
+
+
+            /* STATISTIK */
+
+            document.getElementById("totalPesanan")
+                .innerHTML = pesanan.length;
+
+
+            var jumlahDiproses = 0;
+            var jumlahSelesai = 0;
+
+
+            for (var j = 0; j < pesanan.length; j++) {
+
+                if (
+                    pesanan[j].status !== "Menunggu" &&
+                    pesanan[j].status !== "Selesai"
+                ) {
+
+                    jumlahDiproses++;
+
+                }
+
+
+                if (
+                    pesanan[j].status === "Selesai"
+                ) {
+
+                    jumlahSelesai++;
+
+                }
+
+            }
+
+
+            document.getElementById("diproses")
+                .innerHTML = jumlahDiproses;
+
+
+            document.getElementById("selesai")
+                .innerHTML = jumlahSelesai;
+
+
+            /* JIKA KOSONG */
+
+            if (hasil.length === 0) {
+
+                daftar.innerHTML =
+                    "<div class='kosong'>" +
+
+                    "<h2>📭 Belum Ada Pesanan</h2>" +
+
+                    "<p>" +
+                    "Pesanan pelanggan akan muncul di sini." +
+                    "</p>" +
+
+                    "</div>";
+
+                return;
+            }
+
+
+            daftar.innerHTML = "";
+
+
+            /* TAMPILKAN SETIAP PESANAN */
+
+            for (var k = 0; k < hasil.length; k++) {
+
+                var data = hasil[k];
+
+
+                var html =
+
+                    "<div class='pesanan'>" +
+
+                    "<h3>📦 " +
+                    data.nama +
+                    "</h3>" +
+
+                    "<p><b>No. WhatsApp:</b> " +
+                    data.nomor +
+                    "</p>" +
+
+                    "<p><b>Layanan:</b> " +
+                    data.layanan +
+                    "</p>" +
+
+                    "<p><b>Berat:</b> " +
+                    data.berat +
+                    " Kg</p>" +
+
+                    "<p><b>Total:</b> Rp" +
+                    Number(data.total)
+                    .toLocaleString("id-ID") +
+                    "</p>" +
+
+                    "<p><b>Catatan:</b> " +
+                    data.catatan +
+                    "</p>" +
+
+                    "<p><b>Tanggal:</b> " +
+                    data.tanggal +
+                    "</p>" +
+
+                    "<div class='status'>" +
+
+                    "<label><b>Status Pesanan:</b></label><br><br>" +
+
+                    "<select onchange='ubahStatus(" +
+                    data.id +
+                    ", this.value)'>" +
+
+                    "<option value='Menunggu'" +
+                    (data.status === "Menunggu"
+                        ? " selected"
+                        : "") +
+                    ">Menunggu</option>" +
+
+                    "<option value='Dicuci'" +
+                    (data.status === "Dicuci"
+                        ? " selected"
+                        : "") +
+                    ">Dicuci</option>" +
+
+                    "<option value='Dikeringkan'" +
+                    (data.status === "Dikeringkan"
+                        ? " selected"
+                        : "") +
+                    ">Dikeringkan</option>" +
+
+                    "<option value='Disetrika'" +
+                    (data.status === "Disetrika"
+                        ? " selected"
+                        : "") +
+                    ">Disetrika</option>" +
+
+                    "<option value='Selesai'" +
+                    (data.status === "Selesai"
+                        ? " selected"
+                        : "") +
+                    ">Selesai</option>" +
+
+                    "</select>" +
+
+                    "</div>" +
+
+                    "<button class='btn btn-delete' " +
+                    "onclick='hapusPesanan(" +
+                    data.id +
+                    ")'>" +
+
+                    "🗑️ Hapus Pesanan" +
+
+                    "</button>" +
+
+                    "</div>";
+
+
+                daftar.innerHTML += html;
+
+            }
+
+        }
+
+
+        /* UBAH STATUS */
+
+        function ubahStatus(id, statusBaru) {
+
+            var pesanan =
+                JSON.parse(
+                    localStorage.getItem("pesananLaundry")
+                ) || [];
+
+
+            for (var i = 0; i < pesanan.length; i++) {
+
+                if (pesanan[i].id === id) {
+
+                    pesanan[i].status = statusBaru;
+
+                }
+
+            }
+
+
+            localStorage.setItem(
+                "pesananLaundry",
+                JSON.stringify(pesanan)
+            );
+
+
+            tampilkanPesanan();
+
+        }
+
+
+        /* HAPUS PESANAN */
+
+        function hapusPesanan(id) {
+
+            var yakin =
+                confirm(
+                    "Apakah kamu yakin ingin menghapus pesanan ini?"
+                );
+
+
+            if (!yakin) {
+                return;
+            }
+
+
+            var pesanan =
+                JSON.parse(
+                    localStorage.getItem("pesananLaundry")
+                ) || [];
+
+
+            var baru = [];
+
+
+            for (var i = 0; i < pesanan.length; i++) {
+
+                if (pesanan[i].id !== id) {
+
+                    baru.push(pesanan[i]);
+
+                }
+
+            }
+
+
+            localStorage.setItem(
+                "pesananLaundry",
+                JSON.stringify(baru)
+            );
+
+
+            tampilkanPesanan();
+
+        }
+
+
+        /* JALANKAN SAAT HALAMAN DIBUKA */
+
+        tampilkanPesanan();
+
+    </script>
+
+
+</body>
+
+</html>
